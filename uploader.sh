@@ -19,38 +19,40 @@ case $1 in
 			ssh -T -oStrictHostKeyChecking=no -oConnectTimeout=5 $uname@$target <<'EOF'
 			date
 EOF
-		echo "Uploading $source to $target"
-		lftp -u $uname,$pword sftp://$target << EOF
-		put -O $destination $source
-		quit >> uploader.log
+			echo "Uploading $source to $target"
+			lftp -u $uname,$pword sftp://$target << EOF
+			put -O $destination $source
+			quit >> uploader.log
 EOF
 		;;
 
-	f)  #Input is a list of hosts in file
-		while read host
-		do
-		echo "Adding SSH Key for $host"
-		ssh -T -oStrictHostKeyChecking=no -oConnectTimeout=5 $uname@$host <<'EOF'
-		date
+		f)  #Input is a list of hosts in file
+			while read host
+			do
+			echo "Adding SSH Key for $host"
+			ssh -T -oStrictHostKeyChecking=no -oConnectTimeout=5 $uname@$host <<'EOF'
+			date
 EOF
-		echo "Uploading $source to $host"
-		lftp -u $uname,$pword sftp://$target << EOF 
-		put -O $destination $source
-		quit
+			echo "Uploading $source to $host"
+			lftp -u $uname,$pword sftp://$target << EOF 
+			put -O $destination $source
+			quit
 EOF
-		done < $target
+			done < $target
 		;;
 	esac >> uploader.log
 	
 	case $5 in
-	y) #run install command on uploaded file
-	 	ssh -T -oStrictHostKeyChecking=no -oConnectTimeout=5 $uname@$target <<'EOF'
- 		installer -pkg $destination -target /
+		y) #run install command on uploaded file
+		 	ssh -T -oStrictHostKeyChecking=no -oConnectTimeout=5 $uname@$target <<'EOF'
+ 			installer -pkg $destination -target /
 EOF
-	;;
- 	*) #Any answer that is not y means no
- 		echo "Installation not requested"
- 	;;
+		;;
+		
+		
+ 		*) #Any answer that is not y means no
+ 			echo "Installation not requested"
+ 		;;
  	esac
-;;
+ ;;
 esac
